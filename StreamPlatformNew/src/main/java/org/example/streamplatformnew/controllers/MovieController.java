@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 
 @RestController
@@ -33,6 +34,11 @@ public class MovieController {
     @GetMapping("/{category}")
     public List<Movie> getMoviesByCategory(@PathVariable Category category) {
         return movieService.getMoviesByCategory(category);
+    }
+
+    @GetMapping("/categories")
+    public HashMap<Category , List<Movie>> putAllMoviesIntoCategories(){
+        return movieService.putAllMoviesIntoCategories();
     }
 
 

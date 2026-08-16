@@ -34,8 +34,8 @@ public class CustomListController {
         customListService.removeMovieFromList(Listid, movieid);
     }
 
-    @PostMapping("{name}/{description}")
-    public void CreateListRequest(String name, String description) {
+    @PostMapping("/{name}/{description}")
+    public void createList(@PathVariable String name, @PathVariable String description) {
         customListService.createList(name, description);
     }
 

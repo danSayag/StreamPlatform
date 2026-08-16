@@ -1,11 +1,13 @@
 package org.example.streamplatformnew.services;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.example.streamplatformnew.models.Category;
 import org.example.streamplatformnew.models.Movie;
 import org.example.streamplatformnew.repositroies.MovieRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class MovieService {
@@ -20,13 +22,24 @@ public class MovieService {
         return movieRepository.findAll();
     }
 
+    
+    public HashMap<Category , List<Movie>> putAllMoviesIntoCategories(){
+        HashMap<Category,List<Movie>> categoryMap = new HashMap<>();
+        List<Movie> movies = movieRepository.findAll();
+
+        for(Movie m : movies){
+            categoryMap.computeIfAbsent(m.getCategory(), k -> new ArrayList<Movie>()).add(m);
+        }
+
+        return categoryMap;
+    }
+
     public List<Movie> getMoviesByCategory(Category category) {
         List<Movie> movies = movieRepository.findAll();
 
         movies = movies.stream()
                 .filter(movie -> movie.getCategory().getName().equals(category.getName()))
                 .toList();
-
         return movies;
     }
 
@@ -34,11 +47,7 @@ public class MovieService {
         List<Movie> movies = movieRepository.findAll();
 
         return movies.stream().findFirst().get().getMovieName().equals(movieName) ? movies.get(0) : null;
-
-
-
-
-
-
     }
+
+
 }
