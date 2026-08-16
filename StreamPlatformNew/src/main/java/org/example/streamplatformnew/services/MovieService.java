@@ -21,7 +21,6 @@ public class MovieService {
     public List<Movie> getAllMovies() {
         return movieRepository.findAll();
     }
-
     
     public HashMap<Category , List<Movie>> putAllMoviesIntoCategories(){
         HashMap<Category,List<Movie>> categoryMap = new HashMap<>();
@@ -46,8 +45,10 @@ public class MovieService {
     public Movie getMovieByName(String movieName) {
         List<Movie> movies = movieRepository.findAll();
 
-        return movies.stream().findFirst().get().getMovieName().equals(movieName) ? movies.get(0) : null;
+        return movies.stream()
+                        .findFirst()
+                        .get()
+                        .getMovieName()
+                        .equals(movieName) ? movies.get(0) : null;
     }
-
-
 }
