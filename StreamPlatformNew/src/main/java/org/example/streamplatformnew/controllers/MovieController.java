@@ -2,7 +2,6 @@ package org.example.streamplatformnew.controllers;
 
 import org.example.streamplatformnew.models.Category;
 import org.example.streamplatformnew.models.Movie;
-import org.example.streamplatformnew.repositroies.MovieRepository;
 import org.example.streamplatformnew.services.MovieService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

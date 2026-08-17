@@ -50,4 +50,38 @@ public class MovieService {
     }
 
 
+    public void createMovie(Movie newMovie){
+        if(newMovie == null){
+            throw new RuntimeException("new movie is null");
+        }
+
+        List<Movie> movies = movieRepository.findAll();
+
+        for(Movie m : movies){
+            if(m.getMovieName().equals(newMovie.getMovieName())){
+                throw new RuntimeException("a movie by this name already exist");
+            }
+        }
+        movieRepository.save(newMovie);
+    }
+
+
+    public void updateMovie(long oldMovieId , Movie newMovie){
+        if(newMovie == null){
+            throw new RuntimeException("new movie is null");
+        }
+
+        Movie oldMovie = movieRepository.findById(oldMovieId).get();
+        Movie forDeleteMovie = oldMovie;
+
+
+        oldMovie.setImage(newMovie.getImage());
+        oldMovie.setCategory(newMovie.getCategory());
+        oldMovie.setMovieName(newMovie.getMovieName());
+        
+        movieRepository.findAll().remove(forDeleteMovie);
+        movieRepository.save(oldMovie);
+    }
+
+
 }

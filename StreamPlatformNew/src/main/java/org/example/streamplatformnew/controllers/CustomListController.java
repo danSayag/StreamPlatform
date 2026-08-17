@@ -2,7 +2,6 @@ package org.example.streamplatformnew.controllers;
 
 import jakarta.persistence.Table;
 import org.example.streamplatformnew.models.CustomList;
-import org.example.streamplatformnew.models.Movie;
 import org.example.streamplatformnew.services.CustomListService;
 import org.springframework.web.bind.annotation.*;
 
