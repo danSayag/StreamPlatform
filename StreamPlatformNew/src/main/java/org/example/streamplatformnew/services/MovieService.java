@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.example.streamplatformnew.dto.MovieRequest;
+import org.example.streamplatformnew.exceptions.DuplicateMovieNameException;
+import org.example.streamplatformnew.exceptions.MovieNotFoundException;
 import org.example.streamplatformnew.models.Category;
 import org.example.streamplatformnew.models.Movie;
 import org.example.streamplatformnew.repositroies.MovieRepository;
@@ -50,38 +53,44 @@ public class MovieService {
     }
 
 
-    public void createMovie(Movie newMovie){
-        if(newMovie == null){
-            throw new RuntimeException("new movie is null");
+    public Movie createMovie(MovieRequest request) {
+        String movieName = validatedName(request);
+
+        if (movieRepository.existsByMovieNameIgnoreCase(movieName)) {
+            throw new DuplicateMovieNameException(movieName);
         }
 
-        List<Movie> movies = movieRepository.findAll();
-
-        for(Movie m : movies){
-            if(m.getMovieName().equals(newMovie.getMovieName())){
-                throw new RuntimeException("a movie by this name already exist");
-            }
-        }
-        movieRepository.save(newMovie);
+        return movieRepository.save(new Movie(movieName, request.category()));
     }
 
+    public Movie updateMovie(long movieId, MovieRequest request) {
+        String movieName = validatedName(request);
 
-    public void updateMovie(long oldMovieId , Movie newMovie){
-        if(newMovie == null){
-            throw new RuntimeException("new movie is null");
-        }
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new MovieNotFoundException(movieId));
 
-        Movie oldMovie = movieRepository.findById(oldMovieId).get();
-        Movie forDeleteMovie = oldMovie;
+        movieRepository.findByMovieNameIgnoreCase(movieName)
+                .filter(existing -> existing.getMovieId() != movieId)
+                .ifPresent(existing -> {
+                    throw new DuplicateMovieNameException(movieName);
+                });
 
-
-        oldMovie.setImage(newMovie.getImage());
-        oldMovie.setCategory(newMovie.getCategory());
-        oldMovie.setMovieName(newMovie.getMovieName());
-        
-        movieRepository.findAll().remove(forDeleteMovie);
-        movieRepository.save(oldMovie);
+        movie.setMovieName(movieName);
+        movie.setCategory(request.category());
+        return movieRepository.save(movie);
     }
 
+    private static String validatedName(MovieRequest request) {
+        if (request == null) {
+            throw new IllegalArgumentException("A movie body is required.");
+        }
+        if (request.movieName() == null || request.movieName().isBlank()) {
+            throw new IllegalArgumentException("Movie name is required.");
+        }
+        if (request.category() == null) {
+            throw new IllegalArgumentException("Category is required.");
+        }
+        return request.movieName().trim();
+    }
 
 }
