@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { apiFetch } from './api'
 import type { Movie } from '../types'
 
 export type MovieList = {
@@ -8,7 +9,8 @@ export type MovieList = {
   movies: Movie[]
 }
 
-const BASE = '/api/lists'
+// Bare /lists to match the backend mapping; the Vite proxy forwards the prefix unchanged.
+const BASE = '/lists'
 // Lets every mounted useLists re-read the cache after any write, same tab.
 const CHANGE_EVENT = 'lists:change'
 
@@ -17,13 +19,9 @@ const CHANGE_EVENT = 'lists:change'
 let cache: MovieList[] = []
 let loaded = false
 
-const request = async (url: string, init?: RequestInit) => {
-  const response = await fetch(url, init)
-  if (!response.ok) {
-    throw new Error((await response.text()) || `Request failed: ${response.status}`)
-  }
-  return response
-}
+// apiFetch attaches the bearer token and raises on any non-2xx, including the 403 a
+// ROLE_USER gets here - lists are admin-only.
+const request = (url: string, init?: RequestInit) => apiFetch(url, init)
 
 const refresh = async () => {
   const response = await request(BASE)
@@ -73,7 +71,7 @@ export const useLists = () => {
         })
         const created = (await response.json()) as MovieList
         if (firstMovie) {
-          await request(`${BASE}/${created.id}/movies/${firstMovie.Id}`, { method: 'POST' })
+          await request(`${BASE}/${created.id}/movies/${firstMovie.movieId}`, { method: 'POST' })
         }
         return created.id
       })
@@ -116,14 +114,14 @@ export const useLists = () => {
   const toggleInList = useCallback(
     (listId: number, movie: Movie) => {
       const list = cache.find((l) => l.id === listId)
-      const has = list?.movies.some((m) => m.Id === movie.Id)
-      return has ? removeFromList(listId, movie.Id) : addToList(listId, movie.Id)
+      const has = list?.movies.some((m) => m.movieId === movie.movieId)
+      return has ? removeFromList(listId, movie.movieId) : addToList(listId, movie.movieId)
     },
     [addToList, removeFromList],
   )
 
   const listsWith = useCallback(
-    (movieId: number) => lists.filter((l) => l.movies.some((m) => m.Id === movieId)),
+    (movieId: number) => lists.filter((l) => l.movies.some((m) => m.movieId === movieId)),
     [lists],
   )
 

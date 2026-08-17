@@ -1,15 +1,19 @@
 import { useState } from 'react'
+import { useAuth } from '../auth/useAuth'
 import { initialOf, posterOf, type Movie } from '../types'
 import { ListPicker } from './ListPicker'
 
 export const MovieCard = ({ movie }: { movie: Movie }) => {
   const poster = posterOf(movie)
   const [broken, setBroken] = useState(false)
+  const { isAdmin } = useAuth()
 
   return (
     // Not overflow-hidden: the ListPicker dropdown has to escape the card.
     <div className='group relative rounded-lg bg-gray-800 shadow-lg transition hover:shadow-violet-900/40'>
-      <ListPicker movie={movie} />
+      {/* /lists is admin-only server-side; rendering this for a viewer would fire a 403
+          from every card on the page. */}
+      {isAdmin && <ListPicker movie={movie} />}
 
       <div className='aspect-2/3 w-full overflow-hidden rounded-t-lg'>
         {poster && !broken ? (

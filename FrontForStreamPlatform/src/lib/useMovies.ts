@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { apiFetch } from './api'
 import type { Movie } from '../types'
 
 export const useMovies = () => {
@@ -9,11 +10,10 @@ export const useMovies = () => {
   useEffect(() => {
     const controller = new AbortController()
 
-    fetch('/api/movies', { signal: controller.signal })
-      .then((response) => {
-        if (!response.ok) throw new Error(`Request failed: ${response.status}`)
-        return response.json()
-      })
+    // Bare /movies, not /api/movies: the backend maps it there, and the Vite proxy
+    // forwards the prefix unchanged.
+    apiFetch('/movies', { signal: controller.signal })
+      .then((response) => response.json())
       .then((data: Movie[]) => setMovies(data))
       .catch((err: Error) => {
         if (err.name !== 'AbortError') setError(err.message)
