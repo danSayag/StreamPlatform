@@ -1,12 +1,16 @@
 package org.example.streamplatformnew.repositroies;
 
-import org.example.streamplatformnew.models.Category;
+import java.util.Optional;
+
 import org.example.streamplatformnew.models.Movie;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 
 public interface MovieRepository extends JpaRepository<Movie,Long> {
 
+    // Case-insensitive so "The Last Horizon" and "the last horizon" cannot both exist.
+    Optional<Movie> findByMovieNameIgnoreCase(String movieName);
+
+    boolean existsByMovieNameIgnoreCase(String movieName);
 
 }

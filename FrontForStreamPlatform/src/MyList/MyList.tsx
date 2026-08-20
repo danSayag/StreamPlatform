@@ -1,7 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { MovieGrid } from '../Movies/Movies'
 import { useLists, type MovieList } from '../lib/useLists'
-import type { NavKey } from '../Sidebar/Sidebar'
 
 const ListSection = ({
   list,
@@ -76,7 +76,7 @@ const ListSection = ({
   )
 }
 
-export const MyList = ({ onNavigate }: { onNavigate: (key: NavKey) => void }) => {
+export const MyList = () => {
   const { lists, loading, error, createList, renameList, deleteList } = useLists()
   const [name, setName] = useState('')
   const [saving, setSaving] = useState(false)
@@ -125,13 +125,12 @@ export const MyList = ({ onNavigate }: { onNavigate: (key: NavKey) => void }) =>
           <p className='mt-1 text-sm text-gray-500'>
             Create one above, or save a movie straight into a new list from the catalog.
           </p>
-          <button
-            type='button'
-            onClick={() => onNavigate('movies')}
-            className='mt-4 rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500'
+          <Link
+            to='/browse'
+            className='mt-4 inline-block rounded-lg bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500'
           >
             Browse movies
-          </button>
+          </Link>
         </div>
       ) : (
         lists.map((list) => (

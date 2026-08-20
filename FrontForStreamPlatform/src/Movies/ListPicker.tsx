@@ -9,7 +9,7 @@ export const ListPicker = ({ movie }: { movie: Movie }) => {
   const [name, setName] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)
 
-  const saved = lists.some((l) => l.movies.some((m) => m.Id === movie.Id))
+  const saved = lists.some((l) => l.movies.some((m) => m.movieId === movie.movieId))
 
   useEffect(() => {
     if (!open) return
@@ -73,7 +73,7 @@ export const ListPicker = ({ movie }: { movie: Movie }) => {
               <p className='px-2 pb-2 text-xs text-gray-500'>No lists yet.</p>
             )}
             {lists.map((list) => {
-              const checked = list.movies.some((m) => m.Id === movie.Id)
+              const checked = list.movies.some((m) => m.movieId === movie.movieId)
               return (
                 <label
                   key={list.id}

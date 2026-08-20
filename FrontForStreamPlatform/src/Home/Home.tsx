@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom'
 import hero from '../assets/hero.png'
 import { MovieGrid } from '../Movies/Movies'
+import { useAuth } from '../auth/useAuth'
 import { useMovies } from '../lib/useMovies'
-import type { NavKey } from '../Sidebar/Sidebar'
 
-export const Home = ({ onNavigate }: { onNavigate: (key: NavKey) => void }) => {
+export const Home = () => {
+  const { session, isAdmin } = useAuth()
   const { movies, error, loading } = useMovies()
   const featured = movies.slice(0, 5)
 
@@ -20,7 +22,7 @@ export const Home = ({ onNavigate }: { onNavigate: (key: NavKey) => void }) => {
         <div className='absolute inset-0 -z-10 bg-linear-to-t from-[#0c131a] via-[#0c131a]/70 to-transparent' />
         <div className='mx-auto flex min-h-[70vh] max-w-6xl flex-col justify-end px-6 py-16'>
           <p className='mb-3 text-sm font-semibold tracking-widest text-violet-400 uppercase'>
-            Java + React
+            Welcome back, {session?.username}
           </p>
           <h1 className='max-w-2xl text-4xl font-bold text-white sm:text-6xl'>
             Every movie in your library, one click away.
@@ -30,20 +32,30 @@ export const Home = ({ onNavigate }: { onNavigate: (key: NavKey) => void }) => {
             off.
           </p>
           <div className='mt-8 flex flex-wrap gap-3'>
-            <button
-              type='button'
-              onClick={() => onNavigate('movies')}
+            <Link
+              to='/browse'
               className='rounded-lg bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-violet-500'
             >
               Browse movies
-            </button>
-            <button
-              type='button'
-              onClick={() => onNavigate('myList')}
-              className='rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20'
-            >
-              My Lists
-            </button>
+            </Link>
+            {/* Lists and the panel are admin-only on the server, so these only show for
+                ROLE_ADMIN. */}
+            {isAdmin && (
+              <>
+                <Link
+                  to='/admin'
+                  className='rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20'
+                >
+                  Admin panel
+                </Link>
+                <Link
+                  to='/my-lists'
+                  className='rounded-lg bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20'
+                >
+                  My Lists
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -52,16 +64,12 @@ export const Home = ({ onNavigate }: { onNavigate: (key: NavKey) => void }) => {
       <section className='mx-auto max-w-6xl px-6 py-12'>
         <div className='mb-6 flex items-baseline justify-between'>
           <h2 className='text-xl font-bold text-white'>Trending now</h2>
-          <button
-            type='button'
-            onClick={() => onNavigate('movies')}
-            className='text-sm text-violet-400 transition hover:text-violet-300'
-          >
+          <Link to='/browse' className='text-sm text-violet-400 transition hover:text-violet-300'>
             See all
-          </button>
+          </Link>
         </div>
         {loading && <p className='text-gray-400'>Loading movies...</p>}
-        {error && <p className='text-red-400'>Could not reach the server on port 8080: {error}</p>}
+        {error && <p className='text-red-400'>{error}</p>}
         <MovieGrid movies={featured} />
       </section>
     </div>
