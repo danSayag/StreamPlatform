@@ -71,15 +71,18 @@ StreamPlatform/
 │   │   └── types.ts                 # Shared Movie type + helpers
 │   └── vite.config.ts               # Dev server + /api proxy to the backend
 │
-└── StreamPlatformNew/                # Spring Boot REST API (Java 17)
-    ├── src/main/java/org/example/streamplatformnew/
-    │   ├── controllers/              # MovieController, CustomListController
-    │   ├── services/                 # Business logic
-    │   ├── models/                   # JPA entities — Movie, CustomList, Category
-    │   ├── repositroies/             # Spring Data JPA repositories
-    │   └── config/DataInitializer.java  # Seeds sample movies on startup
-    ├── src/main/resources/application.properties
-    └── Dockerfile                    # Multi-stage build: Maven → JRE Alpine
+├── StreamPlatformNew/                # Spring Boot REST API (Java 17)
+│   ├── src/main/java/org/example/streamplatformnew/
+│   │   ├── controllers/              # MovieController, CustomListController
+│   │   ├── services/                 # Business logic
+│   │   ├── models/                   # JPA entities — Movie, CustomList, Category
+│   │   ├── repositroies/             # Spring Data JPA repositories
+│   │   └── config/DataInitializer.java  # Seeds sample movies on startup
+│   ├── src/main/resources/application.properties
+│   └── Dockerfile                    # Multi-stage build: Maven → JRE Alpine
+│
+├── start.ps1                         # Launches backend + frontend together
+└── start.cmd                         # cmd.exe / double-click wrapper for start.ps1
 ```
 
 ## Getting Started
@@ -90,7 +93,29 @@ StreamPlatform/
 - **Java 17** (backend)
 - Maven is not required globally — the project ships the Maven Wrapper (`mvnw` / `mvnw.cmd`)
 
-### 1. Run the backend
+### Quick start — run everything at once
+
+From the repository root:
+
+```powershell
+.\start.ps1          # or: start.cmd  (from cmd.exe, or double-click it)
+```
+
+[`start.ps1`](start.ps1) launches both halves in their own windows, waits for each port to
+come up, and prints the URLs. Ctrl+C in the launcher window stops everything.
+
+| Flag | Effect |
+|---|---|
+| `-BackendOnly` | Start only the Spring Boot API |
+| `-FrontendOnly` | Start only the Vite dev server (API assumed to be running already) |
+| `-SkipInstall` | Skip the automatic `npm install` when `node_modules` is missing |
+
+It skips whichever service already has its port occupied, so re-running it alongside a
+service you started by hand is safe. On macOS/Linux, use the manual steps below.
+
+### Manual start
+
+#### 1. Run the backend
 
 ```bash
 cd StreamPlatformNew
@@ -99,7 +124,7 @@ cd StreamPlatformNew
 
 The API starts on **http://localhost:8080**, using an in-memory H2 database by default, and automatically seeds 20 sample movies across all five genres on first boot.
 
-### 2. Run the frontend
+#### 2. Run the frontend
 
 ```bash
 cd FrontForStreamPlatform
