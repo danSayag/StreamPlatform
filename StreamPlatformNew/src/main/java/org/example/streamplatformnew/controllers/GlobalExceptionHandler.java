@@ -3,6 +3,7 @@ package org.example.streamplatformnew.controllers;
 import org.example.streamplatformnew.dto.ErrorResponse;
 import org.example.streamplatformnew.exceptions.DuplicateMovieNameException;
 import org.example.streamplatformnew.exceptions.MovieNotFoundException;
+import org.example.streamplatformnew.exceptions.VideoNotAvailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -18,6 +19,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MovieNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(MovieNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
+    }
+
+    /** No file behind the movie, or a path that escaped the media root - both are a 404. */
+    @ExceptionHandler(VideoNotAvailableException.class)
+    public ResponseEntity<ErrorResponse> handleNoVideo(VideoNotAvailableException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
     }
 
