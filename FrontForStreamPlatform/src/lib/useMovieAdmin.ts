@@ -4,7 +4,12 @@ import type { Movie } from '../types'
 
 export type CategoryOption = { value: string; label: string }
 
-export type MovieDraft = { movieName: string; category: string }
+export type MovieDraft = {
+  movieName: string
+  category: string
+  posterUrl: string
+  videoPath: string
+}
 
 /**
  * Admin-side movie CRUD. Kept separate from useMovies, which is the read-only hook the

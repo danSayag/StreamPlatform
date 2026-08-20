@@ -145,8 +145,14 @@ export const AdminPanel = () => {
           <h2 className='mb-4 text-base font-semibold text-white'>Manage</h2>
           <div className='flex flex-wrap gap-3'>
             <Link
-              to='/my-lists'
+              to='/admin/new'
               className='rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500'
+            >
+              Add a movie
+            </Link>
+            <Link
+              to='/my-lists'
+              className='rounded-lg bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20'
             >
               Custom lists
             </Link>

@@ -1,12 +1,15 @@
 import { useState } from 'react'
+import { Play } from 'lucide-react'
 import { useAuth } from '../auth/useAuth'
-import { initialOf, posterOf, type Movie } from '../types'
+import { initialOf, posterSrcOf, type Movie } from '../types'
 import { ListPicker } from './ListPicker'
+import { MoviePlayer } from './MoviePlayer'
 
 export const MovieCard = ({ movie }: { movie: Movie }) => {
-  const poster = posterOf(movie)
   const [broken, setBroken] = useState(false)
-  const { isAdmin } = useAuth()
+  const [playing, setPlaying] = useState(false)
+  const { isAdmin, session } = useAuth()
+  const poster = posterSrcOf(movie, session?.token)
 
   return (
     // Not overflow-hidden: the ListPicker dropdown has to escape the card.
@@ -14,6 +17,24 @@ export const MovieCard = ({ movie }: { movie: Movie }) => {
       {/* /lists is admin-only server-side; rendering this for a viewer would fire a 403
           from every card on the page. */}
       {isAdmin && <ListPicker movie={movie} />}
+
+      {/* The whole poster is the play target. A button rather than a click handler on the
+          div, so it is reachable by keyboard and announced as a control. It sits below the
+          ListPicker's z-20 so the bookmark menu stays clickable. */}
+      <button
+        type='button'
+        onClick={() => setPlaying(true)}
+        aria-label={`Play ${movie.movieName}`}
+        className='absolute inset-0 z-10 rounded-lg focus-visible:ring-2 focus-visible:ring-violet-500 focus-visible:outline-none'
+      >
+        <span className='flex h-full w-full items-center justify-center opacity-0 transition group-hover:opacity-100'>
+          <span className='rounded-full bg-black/70 p-4'>
+            <Play size={28} strokeWidth={1.5} fill='currentColor' className='text-white' aria-hidden />
+          </span>
+        </span>
+      </button>
+
+      {playing && <MoviePlayer movie={movie} onClose={() => setPlaying(false)} />}
 
       <div className='aspect-2/3 w-full overflow-hidden rounded-t-lg'>
         {poster && !broken ? (

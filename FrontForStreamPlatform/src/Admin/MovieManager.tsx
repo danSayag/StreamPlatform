@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import type { CategoryOption, MovieDraft } from '../lib/useMovieAdmin'
 import { labelOf } from '../lib/categories'
 import type { Movie } from '../types'
@@ -9,6 +9,8 @@ const INPUT_CLASS =
 const emptyDraft = (options: CategoryOption[]): MovieDraft => ({
   movieName: '',
   category: options[0]?.value ?? '',
+  posterUrl: '',
+  videoPath: '',
 })
 
 /**
@@ -31,6 +33,15 @@ const MovieForm = ({
   const [draft, setDraft] = useState(initial)
   const [saving, setSaving] = useState(false)
 
+  // useState only reads `initial` on the first render, and the admin panel mounts this
+  // form before the category list has loaded - so without this the add row keeps the
+  // empty category it started with and posts category:"", which the server rejects.
+  useEffect(() => {
+    if (options.length > 0) {
+      setDraft((current) => (current.category ? current : { ...current, category: options[0].value }))
+    }
+  }, [options])
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
     if (!draft.movieName.trim() || saving) return
@@ -42,7 +53,8 @@ const MovieForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className='flex flex-wrap items-center gap-2'>
+    <form onSubmit={handleSubmit} className='space-y-2'>
+      <div className='flex flex-wrap items-center gap-2'>
       <input
         value={draft.movieName}
         onChange={(event) => setDraft({ ...draft, movieName: event.target.value })}
@@ -64,7 +76,7 @@ const MovieForm = ({
       </select>
       <button
         type='submit'
-        disabled={saving || !draft.movieName.trim()}
+        disabled={saving || !draft.movieName.trim() || !draft.category}
         className='rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:opacity-50'
       >
         {saving ? 'Saving…' : submitLabel}
@@ -78,6 +90,26 @@ const MovieForm = ({
           Cancel
         </button>
       )}
+      </div>
+
+      {/* Both optional: a movie with neither still saves, it just shows a placeholder and
+          reports that nothing is attached when opened. */}
+      <div className='flex flex-wrap items-center gap-2'>
+        <input
+          value={draft.posterUrl}
+          onChange={(event) => setDraft({ ...draft, posterUrl: event.target.value })}
+          placeholder='Poster, e.g. poster/kiss.png (optional)'
+          aria-label='Poster image path or URL'
+          className={`${INPUT_CLASS} min-w-0 flex-1`}
+        />
+        <input
+          value={draft.videoPath}
+          onChange={(event) => setDraft({ ...draft, videoPath: event.target.value })}
+          placeholder='Video, e.g. video/kiss.mp4 (optional)'
+          aria-label='Video file path'
+          className={`${INPUT_CLASS} min-w-0 flex-1`}
+        />
+      </div>
     </form>
   )
 }
@@ -101,7 +133,8 @@ export const MovieManager = ({
     <section className='rounded-xl border border-gray-800 bg-[#0f1720] p-6'>
       <h2 className='mb-1 text-base font-semibold text-white'>Movies</h2>
       <p className='mb-5 text-sm text-gray-500'>
-        Add a title or edit an existing one. Names must be unique.
+        Add a title or edit an existing one. Names must be unique. Poster and video paths
+        are relative to the server's media library.
       </p>
 
       {error && (
@@ -133,7 +166,12 @@ export const MovieManager = ({
               {editingId === movie.movieId ? (
                 <MovieForm
                   options={options}
-                  initial={{ movieName: movie.movieName, category: movie.category ?? '' }}
+                  initial={{
+                    movieName: movie.movieName,
+                    category: movie.category ?? '',
+                    posterUrl: movie.posterUrl ?? '',
+                    videoPath: movie.videoPath ?? '',
+                  }}
                   submitLabel='Save'
                   onCancel={() => setEditingId(null)}
                   onSubmit={async (draft) => {

@@ -1,5 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { AdminPanel } from './Admin/AdminPanel'
+import { CreateMovie } from './Admin/CreateMovie'
 import { AdminRoute } from './auth/AdminRoute'
 import { ProtectedRoute } from './auth/ProtectedRoute'
 import { SignIn } from './auth/SignIn'
@@ -9,6 +10,7 @@ import { Movies } from './Movies/Movies'
 import { MyList } from './MyList/MyList'
 import { Sidebar } from './Sidebar/Sidebar'
 import './App.css'
+import { SearchPage } from './Search/SearchPage'
 
 /** Chrome shown on every signed-in screen. */
 const AppLayout = () => (
@@ -36,6 +38,7 @@ function App() {
       {/* Everything below requires a session; ProtectedRoute bounces to /signin. */}
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
+          <Route path='/search' element={<SearchPage />} />
           <Route index element={<Home />} />
           <Route path='/browse' element={<Movies />} />
           <Route path='/series' element={<Series />} />
@@ -44,6 +47,7 @@ function App() {
               matches the API gate rather than inviting a guaranteed 403. */}
           <Route element={<AdminRoute />}>
             <Route path='/admin' element={<AdminPanel />} />
+            <Route path='/admin/new' element={<CreateMovie />} />
             <Route path='/my-lists' element={<MyList />} />
           </Route>
         </Route>

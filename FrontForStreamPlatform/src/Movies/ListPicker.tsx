@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Bookmark } from 'lucide-react'
 import type { Movie } from '../types'
 import { useLists } from '../lib/useLists'
 
@@ -45,21 +46,14 @@ export const ListPicker = ({ movie }: { movie: Movie }) => {
           saved || open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-visible:opacity-100'
         }`}
       >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          viewBox='0 0 24 24'
-          fill={saved ? 'currentColor' : 'none'}
-          stroke='currentColor'
+        {/* Filled while the movie is in a list, outline otherwise. */}
+        <Bookmark
+          size={16}
           strokeWidth={1.5}
-          className={`h-4 w-4 ${saved ? 'text-violet-400' : ''}`}
+          fill={saved ? 'currentColor' : 'none'}
+          className={saved ? 'text-violet-400' : undefined}
           aria-hidden='true'
-        >
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            d='M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z'
-          />
-        </svg>
+        />
       </button>
 
       {open && (
